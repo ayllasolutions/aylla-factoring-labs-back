@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aswpbackend-deployment
+spec:
+  replicas: 1  # Número de réplicas que deseas
+  selector:
+    matchLabels:
+      app: aswpbackend-app
+  template:
+    metadata:
+      labels:
+        app: aswpbackend-app            
+    spec:
+      containers:
+        - name: aswpbackend-container
+          image: gcr.io/ayllasolutions-project/aswpbackendimg1:001
+          ports:
+            - containerPort: 85  # Puerto para el servidor de Socket.IO
+            - containerPort: 3000  # Puerto para la API de servicios
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: aswpbackend-service
+spec:
+  selector:
+    app: aswpbackend-app
+  ports:
+    - name: socketio-port
+      protocol: TCP
+      port: 85  # Puerto para el servidor de Socket.IO
+      targetPort: 85  # Mismo puerto que el de arriba
+    - name: api-port
+      protocol: TCP
+      port: 3000  # Puerto para la API de servicios
+      targetPort: 3000  # Mismo puerto que el de arriba
+  type: LoadBalancer  # O NodePort según tus necesidades
